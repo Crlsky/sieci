@@ -7,9 +7,10 @@
 
 void send_file(FILE *fp, int sockfd){
   int n;
-  char data[SIZE] = {0};
+  unsigned char data[SIZE];
 
-  while(fgets(data, SIZE, fp) != NULL) {
+  while(!feof(fp)) {
+    fread(data, SIZE, 1, fp);
     if (send(sockfd, data, sizeof(data), 0) == -1) {
       perror("[-]Error in sending file.");
       exit(1);
@@ -26,7 +27,7 @@ int main(){
   int sockfd;
   struct sockaddr_in server_addr;
   FILE *fp;
-  char *filename = "crl.jpg";
+  char *filename = "send.txt";
 
   sockfd = socket(AF_INET, SOCK_STREAM, 0);
   if(sockfd < 0) {

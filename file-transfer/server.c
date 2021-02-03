@@ -17,7 +17,8 @@ void write_file(int sockfd){
       break;
       return;
     }
-    fprintf(fp, "%s", buffer);
+
+    fwrite(buffer, 1, sizeof(buffer), fp);
     bzero(buffer, SIZE);
   }
   return;
