@@ -4,28 +4,52 @@
 #include <arpa/inet.h>
 #define SIZE 1024
 
-void write_file(int sockfd){
-  int n;
+void write_file(int sockfd, char *filename){
+  int n = 1;
   FILE *fp;
-  char *filename = "recv.txt";
-  char buffer[SIZE];
+  char buffer[n];
 
   fp = fopen(filename, "w");
-  while (1) {
-    n = recv(sockfd, buffer, SIZE, 0);
-    if (n <= 0){
+  while(1) {
+    n = recv(sockfd, buffer, sizeof(buffer), 0);
+
+    if (n <= 0 || strcmp(buffer, "\x00") == 0){
       break;
       return;
     }
-
+    
     fwrite(buffer, 1, sizeof(buffer), fp);
-    bzero(buffer, SIZE);
   }
+  fclose(fp);
   return;
 }
 
-int main(){
-  char *ip = "127.0.0.1";
+void send_file(char *filename, int sockfd){
+  int n = 1;
+  char data[n];
+  FILE *fp;
+
+  fp = fopen(filename, "r");
+  if (fp == NULL) {
+    perror("[-]Error in reading file.");
+    exit(1);
+  }
+
+  while(!feof(fp)) {
+    fread(data, sizeof(data), 1, fp);
+
+    if (send(sockfd, data, sizeof(data), 0) == -1) {
+      perror("[-]Error in sending file.");
+      exit(1);
+    }
+    bzero(data, sizeof(data));
+  }
+  fclose(fp);
+  return;
+}
+
+int main(int argc, char *argv[]){
+  char *filename = argv[1];
   int port = 8080;
   int e;
 
@@ -43,7 +67,7 @@ int main(){
 
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = port;
-  server_addr.sin_addr.s_addr = inet_addr(ip);
+  server_addr.sin_addr.s_addr = INADDR_ANY;
 
   e = bind(sockfd, (struct sockaddr*)&server_addr, sizeof(server_addr));
   if(e < 0) {
@@ -61,7 +85,8 @@ int main(){
 
   addr_size = sizeof(new_addr);
   new_sock = accept(sockfd, (struct sockaddr*)&new_addr, &addr_size);
-  write_file(new_sock);
+  write_file(new_sock, filename);
+
   printf("[+]Data written in the file successfully.\n");
 
   return 0;

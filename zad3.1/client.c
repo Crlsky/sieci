@@ -47,14 +47,14 @@ int main(int argc, char **argv)
     
         r = 0;
         while (r < BUFFER_SIZE) {
-                r += recvfrom(gniazdo,
-                                buf,
-                                BUFFER_SIZE-r,
-                                0,
-                                (struct sockaddr*) &adr,
-                                &addrlen);
-                
-                        printf("reciv %d\n", r);
+            r += recvfrom(gniazdo,
+                            buf,
+                            BUFFER_SIZE-r,
+                            0,
+                            (struct sockaddr*) &adr,
+                            &addrlen);
+            
+            printf("reciv %d\n", r);
         }
     }
 	close(gniazdo);
