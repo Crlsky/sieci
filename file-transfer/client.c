@@ -6,16 +6,14 @@
 #define SIZE 1024
 
 void send_file(FILE *fp, int sockfd){
-  int n;
-  unsigned char data[SIZE];
-
   while(!feof(fp)) {
-    fread(data, SIZE, 1, fp);
+    char data[sizeof(fp)-1];
+    fread(data, sizeof(fp), 1, fp);
     if (send(sockfd, data, sizeof(data), 0) == -1) {
       perror("[-]Error in sending file.");
       exit(1);
     }
-    bzero(data, SIZE);
+    bzero(data, sizeof(fp)-1);
   }
 }
 
