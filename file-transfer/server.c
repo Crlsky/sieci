@@ -50,7 +50,7 @@ void send_file(char *filename, int sockfd){
 
 int main(int argc, char *argv[]){
   char *filename = argv[1];
-  int port = 8080;
+  int port = 6999;
   int e;
 
   int sockfd, new_sock;
